@@ -3,6 +3,9 @@
 <html>
 <head>
     <title>Available Workspaces</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -36,15 +39,17 @@
 
     {% for workspace in workspaces %}
 
-        <h2>{{ workspace['workspace_name'] }}</h2>
+        <div class="workspace-card">
 
-        <p>Location: {{ workspace['location'] }}</p>
+            <h2>{{ workspace['workspace_name'] }}</h2>
 
-        <a href="{{ url_for('workspace_details', workspace_id=workspace['id']) }}">
-            View Details
-        </a>
+            <p>Location: {{ workspace['location'] }}</p>
 
-        <hr>
+            <a href="{{ url_for('workspace_details', workspace_id=workspace['id']) }}">
+                View Details
+            </a>
+
+        </div>
 
     {% else %}
 
