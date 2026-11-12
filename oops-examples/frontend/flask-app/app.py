@@ -1,12 +1,11 @@
 
-from flask import Flask, request, session, redirect
+from flask import Flask, request, session, redirect, render_template, abort
 import sqlite3
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
-# Secret key for session security
 app.secret_key = "change_this_to_a_random_secret_key"
 
 
@@ -17,10 +16,11 @@ def connect_db():
     return conn
 
 
-# Create users table
+# Create database tables
 def create_table():
     conn = connect_db()
 
+    # Users table
     conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,6 +29,33 @@ def create_table():
             password TEXT NOT NULL
         )
     """)
+
+    # Workspaces table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS workspaces (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            workspace_name TEXT NOT NULL,
+            location TEXT NOT NULL
+        )
+    """)
+
+    # Add sample workspaces if the table is empty
+    count = conn.execute(
+        "SELECT COUNT(*) FROM workspaces"
+    ).fetchone()[0]
+
+    if count == 0:
+        conn.executemany(
+            """
+            INSERT INTO workspaces (workspace_name, location)
+            VALUES (?, ?)
+            """,
+            [
+                ("Tech Workspace", "Bangalore"),
+                ("Training Room", "Belagavi"),
+                ("Meeting Room", "Mysore")
+            ]
+        )
 
     conn.commit()
     conn.close()
@@ -48,7 +75,6 @@ def register():
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
 
-    # Input validation
     if not name or not email or not password:
         return "All fields are required"
 
@@ -60,7 +86,6 @@ def register():
 
     conn = connect_db()
 
-    # Check duplicate email
     user = conn.execute(
         "SELECT id FROM users WHERE email = ?",
         (email,)
@@ -70,11 +95,13 @@ def register():
         conn.close()
         return "Email already registered"
 
-    # Hash the password
     hashed_password = generate_password_hash(password)
 
     conn.execute(
-        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+        """
+        INSERT INTO users (name, email, password)
+        VALUES (?, ?, ?)
+        """,
         (name, email, hashed_password)
     )
 
@@ -91,7 +118,6 @@ def login():
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
 
-    # Input validation
     if not email or not password:
         return "Email and password are required"
 
@@ -107,14 +133,12 @@ def login():
     if user and check_password_hash(user["password"], password):
 
         session.clear()
-
         session["user_id"] = user["id"]
         session["user_name"] = user["name"]
 
         return redirect("/dashboard")
 
-    else:
-        return "Invalid email or password"
+    return "Invalid email or password"
 
 
 # Protected dashboard
@@ -136,7 +160,69 @@ def logout():
     return "Logout successful"
 
 
-# Run application
+# DAY 6 - Workspace listing, search and filter
+@app.route("/workspaces")
+def workspaces():
+
+    search = request.args.get("search", "").strip()
+    location = request.args.get("location", "").strip()
+
+    conn = connect_db()
+
+    query = "SELECT * FROM workspaces WHERE 1=1"
+    values = []
+
+    # Search by workspace name
+    if search:
+        query += " AND workspace_name LIKE ?"
+        values.append("%" + search + "%")
+
+    # Filter by location
+    if location:
+        query += " AND location = ?"
+        values.append(location)
+
+    workspace_list = conn.execute(
+        query, values
+    ).fetchall()
+
+    locations = conn.execute(
+        "SELECT DISTINCT location FROM workspaces"
+    ).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "workspaces.html",
+        workspaces=workspace_list,
+        locations=locations,
+        search=search,
+        selected_location=location
+    )
+
+
+# DAY 6 - Workspace details
+@app.route("/workspace/<int:workspace_id>")
+def workspace_details(workspace_id):
+
+    conn = connect_db()
+
+    workspace = conn.execute(
+        "SELECT * FROM workspaces WHERE id = ?",
+        (workspace_id,)
+    ).fetchone()
+
+    conn.close()
+
+    if workspace is None:
+        abort(404)
+
+    return render_template(
+        "workspace_details.html",
+        workspace=workspace
+    )
+
+
 if __name__ == "__main__":
     create_table()
     app.run(debug=True)
