@@ -1,0 +1,9 @@
+*.db
+__pycache__/
+*.pyc
+oops-examples/frontend/flask-app/check_backup.py
+oops-examples/frontend/flask-app/check_booking_status.py
+oops-examples/frontend/flask-app/check_bookings.py
+oops-examples/frontend/flask-app/check_seats.py
+oops-examples/frontend/flask-app/database.py
+oops-examples/frontend/flask-app/fix_duplicates.py

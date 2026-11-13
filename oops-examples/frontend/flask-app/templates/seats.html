@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workspace Seats</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f5f6fa;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .seat-summary {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .summary-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .summary-card {
+            padding: 15px 25px;
+            border-radius: 8px;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        .total {
+            background-color: #e3e8ff;
+            color: #263b91;
+        }
+
+        .available {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .booked {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .seat-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .seat-card {
+            width: 130px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .available-seat {
+            border: 2px solid #28a745;
+        }
+
+        .booked-seat {
+            border: 2px solid #dc3545;
+        }
+
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+        }
+
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>{{ workspace['workspace_name'] }}</h1>
+
+    <p>Location: {{ workspace['location'] }}</p>
+
+    <p>Workspace ID: {{ workspace['id'] }}</p>
+
+    <hr>
+
+    <!-- Seat Summary -->
+    <div class="seat-summary">
+
+        <h2>Seat Summary</h2>
+
+        <div class="summary-container">
+
+            <div class="summary-card total">
+                <h2>{{ total_seats }}</h2>
+                <p>Total Seats</p>
+            </div>
+
+            <div class="summary-card available">
+                <h2>{{ available_seats }}</h2>
+                <p>Available Seats</p>
+            </div>
+
+            <div class="summary-card booked">
+                <h2>{{ booked_seats }}</h2>
+                <p>Booked Seats</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <hr>
+
+    <h2>Available Seats</h2>
+
+    <p>Login User ID: {{ session.get('user_id', 'Not logged in') }}</p>
+
+    <!-- Display Seats -->
+    <div class="seat-container">
+
+        {% for seat in seats %}
+
+            {% if seat['status'] == 'Available' %}
+
+                <div class="seat-card available-seat">
+
+                    <h3>{{ seat['seat_number'] }}</h3>
+
+                    <p>Available</p>
+
+                    {% if session.get('user_id') %}
+
+                        <form action="{{ url_for('book_seat', seat_id=seat['id']) }}"
+                              method="POST">
+
+                            <button type="submit">
+                                Book Seat
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <p>Please login to book.</p>
+
+                        <a href="{{ url_for('login') }}">
+                            Login
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% else %}
+
+                <div class="seat-card booked-seat">
+
+                    <h3>{{ seat['seat_number'] }}</h3>
+
+                    <p>Booked</p>
+
+                    <button type="button" disabled>
+                        Not Available
+                    </button>
+
+                </div>
+
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+    <br>
+
+    <a href="{{ url_for('workspaces') }}">
+        Back to Workspaces
+    </a>
+
+    <br>
+
+    <a href="{{ url_for('my_bookings') }}">
+        My Bookings
+    </a>
+
+</body>
+</html>

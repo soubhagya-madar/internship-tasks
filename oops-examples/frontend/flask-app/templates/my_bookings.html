@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Bookings</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>My Bookings</h1>
+
+    {% if bookings %}
+
+        {% for booking in bookings %}
+
+            <div class="seat-card">
+
+                <h3>{{ booking['workspace_name'] }}</h3>
+
+                <p>Seat: {{ booking['seat_number'] }}</p>
+
+                <p>Booking Date: {{ booking['booking_date'] }}</p>
+
+                <p>Status: {{ booking['status'] }}</p>
+
+                {% if booking['status'] == 'Booked' %}
+
+                    <form action="{{ url_for('cancel_booking', booking_id=booking['booking_id']) }}"
+                          method="POST">
+
+                        <button type="submit">
+                            Cancel Booking
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>You have no bookings.</p>
+
+    {% endif %}
+
+    <br>
+
+    <a href="/workspaces">Back to Workspaces</a>
+
+</body>
+</html>

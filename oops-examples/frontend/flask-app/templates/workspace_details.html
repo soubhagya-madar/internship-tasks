@@ -3,18 +3,73 @@
 <html>
 <head>
     <title>Workspace Details</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6fa;
+            margin: 30px;
+        }
+
+        .workspace-card {
+            background-color: white;
+            padding: 25px;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 18px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
 </head>
+
 <body>
 
-    <h1>Workspace Details</h1>
+    <div class="workspace-card">
 
-    <h2>{{ workspace['workspace_name'] }}</h2>
+        <h1>{{ workspace['workspace_name'] }}</h1>
 
-    <p>Workspace ID: {{ workspace['id'] }}</p>
+        <p><strong>Workspace ID:</strong> {{ workspace['id'] }}</p>
 
-    <p>Location: {{ workspace['location'] }}</p>
+        <p><strong>Location:</strong> {{ workspace['location'] }}</p>
 
-    <a href="/workspaces">Back to Workspaces</a>
+        <p><strong>Status:</strong> Active</p>
+
+        <a class="button"
+           href="{{ url_for('display_seats', workspace_id=workspace['id']) }}">
+            View Seats
+        </a>
+
+        <a class="back-link"
+           href="{{ url_for('workspaces') }}">
+            Back to Workspaces
+        </a>
+
+    </div>
 
 </body>
 </html>
+

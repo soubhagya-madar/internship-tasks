@@ -4,58 +4,200 @@
 <head>
     <title>Available Workspaces</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .logout {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .search-box {
+            margin-bottom: 25px;
+        }
+
+        .search-box input {
+            padding: 10px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-box button {
+            padding: 10px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .workspace-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .workspace-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .workspace-card h2 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        .seat-info {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .seat-info p {
+            margin: 8px 0;
+        }
+
+        .available {
+            color: green;
+            font-weight: bold;
+        }
+
+        .booked {
+            color: red;
+            font-weight: bold;
+        }
+
+        .details-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 14px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .bookings-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .no-results {
+            color: #666;
+        }
+    </style>
 </head>
+
 <body>
 
-    <h1>Book My Seat - Workspaces</h1>
+    <div class="header">
+        <h1>Welcome, {{ session.get('user_name') }}!</h1>
 
-    <form action="/workspaces" method="GET">
+        <a href="{{ url_for('logout') }}" class="logout">
+            Logout
+        </a>
+    </div>
+
+    <h2>Available Workspaces</h2>
+
+    <form method="GET"
+          action="{{ url_for('workspaces') }}"
+          class="search-box">
 
         <input
             type="text"
             name="search"
-            placeholder="Search workspace"
+            placeholder="Search workspace or location"
             value="{{ search }}"
         >
 
-        <select name="location">
-            <option value="">All Locations</option>
-
-            {% for item in locations %}
-            <option value="{{ item['location'] }}"
-                {% if selected_location == item['location'] %}selected{% endif %}>
-                {{ item['location'] }}
-            </option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Search / Filter</button>
-
+        <button type="submit">Search</button>
     </form>
 
-    <hr>
+    <div class="workspace-container">
 
-    {% for workspace in workspaces %}
+        {% for workspace in workspaces %}
 
         <div class="workspace-card">
 
             <h2>{{ workspace['workspace_name'] }}</h2>
 
-            <p>Location: {{ workspace['location'] }}</p>
+            <p>
+                <strong>Location:</strong>
+                {{ workspace['location'] }}
+            </p>
 
-            <a href="{{ url_for('workspace_details', workspace_id=workspace['id']) }}">
+            <p>
+                <strong>Workspace ID:</strong>
+                {{ workspace['id'] }}
+            </p>
+
+            <div class="seat-info">
+
+                <p>
+                    Total Seats:
+                    {{ workspace['total_seats'] }}
+                </p>
+
+                <p class="available">
+                    Available Seats:
+                    {{ workspace['available_seats'] }}
+                </p>
+
+                <p class="booked">
+                    Booked Seats:
+                    {{ workspace['booked_seats'] }}
+                </p>
+
+            </div>
+
+            <a
+                href="{{ url_for('workspace_details', workspace_id=workspace['id']) }}"
+                class="details-button"
+            >
                 View Details
             </a>
 
         </div>
 
-    {% else %}
+        {% else %}
 
-        <p>No workspaces found.</p>
+        <p class="no-results">
+            No workspaces found.
+        </p>
 
-    {% endfor %}
+        {% endfor %}
+
+    </div>
+
+    <a href="{{ url_for('my_bookings') }}" class="bookings-link">
+        View My Bookings
+    </a>
 
 </body>
 </html>
