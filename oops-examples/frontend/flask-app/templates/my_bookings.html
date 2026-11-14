@@ -1,55 +1,185 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Bookings</title>
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #17365d;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #17365d;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f5f7fa;
+        }
+
+        .booked {
+            color: green;
+            font-weight: bold;
+        }
+
+        .cancelled {
+            color: red;
+            font-weight: bold;
+        }
+
+        .cancel-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-btn:hover {
+            background: #b02a37;
+        }
+
+        .no-action {
+            color: gray;
+        }
+
+        .message {
+            text-align: center;
+            color: green;
+            margin-bottom: 15px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: gray;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            background: #17365d;
+            color: white;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
+
 <body>
+
+<div class="container">
 
     <h1>My Bookings</h1>
 
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     {% if bookings %}
 
-        {% for booking in bookings %}
+    <table>
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Workspace</th>
+                <th>Location</th>
+                <th>Seat Number</th>
+                <th>Booking Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
 
-            <div class="seat-card">
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking.booking_id }}</td>
 
-                <h3>{{ booking['workspace_name'] }}</h3>
+                <td>{{ booking.workspace_name }}</td>
 
-                <p>Seat: {{ booking['seat_number'] }}</p>
+                <td>{{ booking.location }}</td>
 
-                <p>Booking Date: {{ booking['booking_date'] }}</p>
+                <td>{{ booking.seat_number }}</td>
 
-                <p>Status: {{ booking['status'] }}</p>
+                <td>{{ booking.booking_date }}</td>
 
-                {% if booking['status'] == 'Booked' %}
+                <td>
+                    {% if booking.status == 'Booked' %}
+                        <span class="booked">Booked</span>
+                    {% else %}
+                        <span class="cancelled">Cancelled</span>
+                    {% endif %}
+                </td>
 
-                    <form action="{{ url_for('cancel_booking', booking_id=booking['booking_id']) }}"
-                          method="POST">
+                <td>
+                    {% if booking.status == 'Booked' %}
+                        <form action="{{ url_for('cancel_booking', booking_id=booking.booking_id) }}"
+                              method="POST">
 
-                        <button type="submit">
-                            Cancel Booking
-                        </button>
+                            <button type="submit" class="cancel-btn">
+                                Cancel Booking
+                            </button>
 
-                    </form>
-
-                {% endif %}
-
-            </div>
-
-        {% endfor %}
+                        </form>
+                    {% else %}
+                        <span class="no-action">No Action</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     {% else %}
 
-        <p>You have no bookings.</p>
+        <p class="empty">You have not made any bookings yet.</p>
 
     {% endif %}
 
-    <br>
+    <a href="{{ url_for('workspaces') }}" class="back-link">
+        Back to Workspaces
+    </a>
 
-    <a href="/workspaces">Back to Workspaces</a>
+</div>
 
 </body>
 </html>
