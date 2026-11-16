@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Workspaces</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>Manage Workspaces</h1>
+
+    <p>
+        <a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
+    </p>
+
+    <hr>
+
+    <h2>Add New Workspace</h2>
+
+    <form action="{{ url_for('admin_workspaces') }}" method="POST">
+
+        <label>Workspace Name:</label>
+        <input type="text" name="workspace_name" required>
+
+        <br><br>
+
+        <label>Location:</label>
+        <input type="text" name="location" required>
+
+        <br><br>
+
+        <button type="submit">Add Workspace</button>
+
+    </form>
+
+    <hr>
+
+    <h2>Existing Workspaces</h2>
+
+    {% for workspace in workspaces %}
+
+        <h3>{{ workspace.workspace_name }}</h3>
+
+        <p>Location: {{ workspace.location }}</p>
+
+        <form action="{{ url_for('admin_update_workspace', workspace_id=workspace.id) }}"
+              method="POST">
+
+            <input type="text" name="workspace_name"
+                   value="{{ workspace.workspace_name }}" required>
+
+            <input type="text" name="location"
+                   value="{{ workspace.location }}" required>
+
+            <button type="submit">Update</button>
+
+        </form>
+
+        <p>
+            <a href="/admin/workspace/{{ workspace.id }}/seats">
+                Manage Seats
+            </a>
+        </p>
+
+        <form action="{{ url_for('admin_deactivate_workspace', workspace_id=workspace.id) }}"
+              method="POST">
+
+            <button type="submit">Deactivate Workspace</button>
+
+        </form>
+
+        <hr>
+
+    {% endfor %}
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+</body>
+</html>

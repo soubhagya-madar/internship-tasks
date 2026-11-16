@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Seats</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>Manage Seats</h1>
+
+    <h2>{{ workspace.workspace_name }}</h2>
+    <p>Location: {{ workspace.location }}</p>
+
+    <p>
+        <a href="{{ url_for('admin_workspaces') }}">Back to Workspaces</a>
+    </p>
+
+    <hr>
+
+    <h2>Add New Seat</h2>
+
+    <form method="POST" action="{{ url_for('admin_seats', workspace_id=workspace.id) }}">
+
+        <label>Seat Number:</label>
+        <input type="text" name="seat_number" placeholder="Example: A6" required>
+
+        <button type="submit">Add Seat</button>
+
+    </form>
+
+    <hr>
+
+    <h2>Existing Seats</h2>
+
+    {% for seat in seats %}
+
+        <h3>Seat: {{ seat.seat_number }}</h3>
+        <p>Status: {{ seat.status }}</p>
+
+        <form method="POST"
+              action="{{ url_for('admin_update_seat', seat_id=seat.id) }}">
+
+            <input type="text" name="seat_number"
+                   value="{{ seat.seat_number }}" required>
+
+            <button type="submit">Update Seat</button>
+
+        </form>
+
+        <form method="POST"
+              action="{{ url_for('admin_deactivate_seat', seat_id=seat.id) }}">
+
+            <button type="submit">Deactivate Seat</button>
+
+        </form>
+
+        <hr>
+
+    {% endfor %}
+
+</body>
+</html>

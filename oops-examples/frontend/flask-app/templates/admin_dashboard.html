@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>Admin Dashboard</h1>
+
+    <h3>Welcome, {{ session.get('user_name') }}!</h3>
+
+    <p>You are logged in as Admin.</p>
+
+    <hr>
+
+    <h2>Dashboard Overview</h2>
+
+    <div>
+        <h3>Total Workspaces</h3>
+        <h2>{{ total_workspaces }}</h2>
+    </div>
+
+    <div>
+        <h3>Total Seats</h3>
+        <h2>{{ total_seats }}</h2>
+    </div>
+
+    <div>
+        <h3>Total Users</h3>
+        <h2>{{ total_users }}</h2>
+    </div>
+
+    <div>
+        <h3>Active Bookings</h3>
+        <h2>{{ total_bookings }}</h2>
+    </div>
+
+    <hr>
+
+    <h2>Admin Management</h2>
+
+    <p>
+        <a href="{{ url_for('admin_workspaces') }}">
+            Manage Workspaces and Seats
+        </a>
+    </p>
+
+    <br>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+</body>
+</html>
