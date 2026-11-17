@@ -1,0 +1,28 @@
+
+# Python cache
+*.pyc
+__pycache__/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Application logs
+*.log
+
+# Backup files
+backup_*.py
+
+# Local environment
+.venv/
+venv/
+.env
+
+# Existing ignored files
+oops-examples/frontend/flask-app/check_backup.py
+oops-examples/frontend/flask-app/check_booking_status.py
+oops-examples/frontend/flask-app/check_bookings.py
+oops-examples/frontend/flask-app/check_seats.py
+oops-examples/frontend/flask-app/database.py
+oops-examples/frontend/flask-app/fix_duplicates.py
