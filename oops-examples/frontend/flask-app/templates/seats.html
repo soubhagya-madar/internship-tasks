@@ -137,7 +137,6 @@
 
     <h2>Available Seats</h2>
 
-    <p>Login User ID: {{ session.get('user_id', 'Not logged in') }}</p>
 
     <!-- Display Seats -->
     <div class="seat-container">
@@ -152,16 +151,18 @@
 
                     <p>Available</p>
 
-                    {% if session.get('user_id') %}
+                    {% if session.get('user_id') and session.get('role') == 'user' %}
 
                         <form action="{{ url_for('book_seat', seat_id=seat['id']) }}"
-                              method="POST">
+      method="POST">
 
-                            <button type="submit">
-                                Book Seat
-                            </button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                        </form>
+    <button type="submit">
+        Book Seat
+    </button>
+
+</form>
 
                     {% else %}
 

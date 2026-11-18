@@ -1,4 +1,3 @@
-
 from flask import (
     Flask, render_template, request, redirect,
     url_for, session, flash, jsonify
@@ -10,6 +9,7 @@ import logging
 from functools import wraps
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf.csrf import CSRFProtect
 
 
 # ---------------- LOGGING CONFIGURATION ----------------
@@ -26,7 +26,9 @@ logging.info("Application logging started")
 # ---------------- FLASK CONFIGURATION ----------------
 
 app = Flask(__name__)
-app.secret_key = "workspace_booking_secret_key"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+
+csrf = CSRFProtect(app)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, "users.db")
@@ -412,12 +414,11 @@ def api_login():
 
 # ---------------- LOGOUT ----------------
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
 
     session.clear()
     return redirect(url_for("login"))
-
 
 # ---------------- USER DASHBOARD ----------------
 
@@ -1204,7 +1205,6 @@ def admin_deactivate_seat(seat_id):
 def page_not_found(error):
     logging.warning("404 Error: Page not found")
     return "Page not found. Please check the URL.", 404
-
 
 @app.errorhandler(500)
 def internal_server_error(error):

@@ -9,29 +9,40 @@
 
     <h1>Create Account</h1>
 
-    <form action="/register" method="POST">
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
-        <label>Name:</label>
-        <input type="text" name="name" required>
 
-        <br><br>
+    <form action="{{ url_for('register') }}" method="POST">
 
-        <label>Email:</label>
-        <input type="email" name="email" required>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <br><br>
+    <label>Name:</label>
+    <input type="text" name="name" required>
 
-        <label>Password:</label>
-        <input type="password" name="password" required>
+    <br><br>
 
-        <br><br>
+    <label>Email:</label>
+    <input type="email" name="email" required>
 
-        <button type="submit">Register</button>
+    <br><br>
 
-    </form>
+    <label>Password:</label>
+    <input type="password" name="password" required>
+
+    <br><br>
+
+    <button type="submit">Register</button>
+
+</form>
 
     <p>Already have an account?
-        <a href="/login">Login here</a>
+        <a href="{{ url_for('login') }}">Login here</a>
     </p>
 
 </body>

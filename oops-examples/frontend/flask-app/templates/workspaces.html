@@ -24,11 +24,14 @@
         }
 
         .logout {
-            background-color: #dc3545;
-            color: white;
-            padding: 10px 16px;
-            text-decoration: none;
-            border-radius: 5px;
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
         }
 
         .search-box {
@@ -118,9 +121,10 @@
     <div class="header">
         <h1>Welcome, {{ session.get('user_name') }}!</h1>
 
-        <a href="{{ url_for('logout') }}" class="logout">
-            Logout
-        </a>
+        <form action="{{ url_for('logout') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="logout">Logout</button>
+</form>
     </div>
 
     <h2>Available Workspaces</h2>
@@ -198,6 +202,5 @@
     <a href="{{ url_for('my_bookings') }}" class="bookings-link">
         View My Bookings
     </a>
-
 </body>
 </html>

@@ -22,6 +22,8 @@
 
     <form method="POST" action="{{ url_for('admin_seats', workspace_id=workspace.id) }}">
 
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         <label>Seat Number:</label>
         <input type="text" name="seat_number" placeholder="Example: A6" required>
 
@@ -41,6 +43,8 @@
         <form method="POST"
               action="{{ url_for('admin_update_seat', seat_id=seat.id) }}">
 
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <input type="text" name="seat_number"
                    value="{{ seat.seat_number }}" required>
 
@@ -50,6 +54,8 @@
 
         <form method="POST"
               action="{{ url_for('admin_deactivate_seat', seat_id=seat.id) }}">
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <button type="submit">Deactivate Seat</button>
 

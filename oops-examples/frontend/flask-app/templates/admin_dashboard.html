@@ -49,7 +49,10 @@
 
     <br>
 
-    <a href="{{ url_for('logout') }}">Logout</a>
+    <form action="{{ url_for('logout') }}" method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Logout</button>
+</form>
 
 </body>
 </html>

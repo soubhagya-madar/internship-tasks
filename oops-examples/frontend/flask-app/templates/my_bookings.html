@@ -153,13 +153,15 @@
                 <td>
                     {% if booking.status == 'Booked' %}
                         <form action="{{ url_for('cancel_booking', booking_id=booking.booking_id) }}"
-                              method="POST">
+      method="POST">
 
-                            <button type="submit" class="cancel-btn">
-                                Cancel Booking
-                            </button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                        </form>
+    <button type="submit" class="cancel-btn">
+        Cancel Booking
+    </button>
+
+</form>
                     {% else %}
                         <span class="no-action">No Action</span>
                     {% endif %}
