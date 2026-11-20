@@ -1,49 +1,286 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Book My Seat</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            display: flex;
+            width: 850px;
+            max-width: 100%;
+            min-height: 500px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
+        }
+
+        .register-left {
+            width: 45%;
+            background: #17365d;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .register-left h1 {
+            font-size: 32px;
+            margin-bottom: 18px;
+        }
+
+        .register-left p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #dbeafe;
+        }
+
+        .register-right {
+            width: 55%;
+            padding: 45px;
+        }
+
+        .register-right h2 {
+            color: #17365d;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        }
+
+        .password-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .password-option input {
+            width: auto;
+        }
+
+        .password-option label {
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 13px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .register-button:hover {
+            background: #1d4ed8;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .flash-message {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 650px) {
+            .register-container {
+                flex-direction: column;
+            }
+
+            .register-left,
+            .register-right {
+                width: 100%;
+            }
+
+            .register-left {
+                padding: 30px;
+            }
+
+            .register-left h1 {
+                font-size: 26px;
+            }
+
+            .register-right {
+                padding: 35px 25px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <h1>Create Account</h1>
+    <div class="register-container">
 
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for message in messages %}
-            <p style="color: red;">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+        <div class="register-left">
+            <h1>Book My Seat</h1>
+            <p>
+                Create your account and discover convenient
+                workspaces. Choose your preferred seat and
+                manage your bookings easily.
+            </p>
+        </div>
 
+        <div class="register-right">
 
-    <form action="{{ url_for('register') }}" method="POST">
+            <h2>Create Account</h2>
+            <p class="subtitle">Register to get started with Book My Seat.</p>
 
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-    <label>Name:</label>
-    <input type="text" name="name" required>
+            <form action="{{ url_for('register') }}" method="POST">
 
-    <br><br>
+                <input type="hidden" name="csrf_token"
+                       value="{{ csrf_token() }}">
 
-    <label>Email:</label>
-    <input type="email" name="email" required>
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required>
+                </div>
 
-    <br><br>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="example@gmail.com"
+                        autocomplete="email"
+                        required>
+                </div>
 
-    <label>Password:</label>
-    <input type="password" name="password" required>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create your password"
+                        autocomplete="new-password"
+                        required>
 
-    <br><br>
+                    <div class="password-option">
+                        <input type="checkbox" id="showPassword"
+                               onclick="togglePassword()">
+                        <label for="showPassword">Show password</label>
+                    </div>
+                </div>
 
-    <button type="submit">Register</button>
+                <button type="submit" class="register-button">
+                    Create Account
+                </button>
 
-</form>
+            </form>
 
-    <p>Already have an account?
-        <a href="{{ url_for('login') }}">Login here</a>
-    </p>
+            <p class="login-link">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Login here</a>
+            </p>
+
+        </div>
+
+    </div>
+
+    <script>
+        function togglePassword() {
+            const password = document.getElementById("password");
+
+            if (password.type === "password") {
+                password.type = "text";
+            } else {
+                password.type = "password";
+            }
+        }
+    </script>
 
 </body>
 </html>

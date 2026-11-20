@@ -1,206 +1,683 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Available Workspaces</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Workspaces | Book My Seat</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
 
-        .header {
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #172b4d;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: #142d4e;
+            color: white;
+            padding: 17px 7%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            gap: 15px;
         }
 
-        h1 {
-            color: #333;
+        .brand {
+            font-size: 23px;
+            font-weight: bold;
+            letter-spacing: 0.3px;
+        }
+
+        .brand span {
+            color: #60a5fa;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-actions form {
+            margin: 0;
+        }
+
+        .nav-actions a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: bold;
+            background: #2563eb;
+            transition: background 0.2s;
+        }
+
+        .nav-actions a:hover {
+            background: #1d4ed8;
         }
 
         .logout {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-}
+            background: #dc3545;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
         }
 
+        .logout:hover {
+            background: #b91c1c;
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 0 25px;
+        }
+
+        /* Welcome banner */
+        .welcome-section {
+            background: linear-gradient(120deg, #17365d, #2563a6);
+            color: white;
+            padding: 36px;
+            border-radius: 15px;
+            margin-bottom: 35px;
+            box-shadow: 0 7px 20px rgba(23, 54, 93, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::after {
+            content: "🪑";
+            position: absolute;
+            right: 55px;
+            top: 25px;
+            font-size: 75px;
+            opacity: 0.22;
+        }
+
+        .welcome-label {
+            color: #bfdbfe;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .welcome-section h1 {
+            font-size: 30px;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-section p {
+            color: #e2e8f0;
+            font-size: 15px;
+            line-height: 1.6;
+            max-width: 650px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Flash messages */
+        .flash-message {
+            padding: 14px 18px;
+            margin-bottom: 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* Workspace heading */
+        .section-header {
+            margin-bottom: 22px;
+        }
+
+        .section-header h2 {
+            color: #17365d;
+            font-size: 24px;
+            margin-bottom: 7px;
+        }
+
+        .section-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Search */
         .search-box {
-            margin-bottom: 25px;
+            display: flex;
+            gap: 10px;
+            max-width: 650px;
+            margin-bottom: 22px;
         }
 
         .search-box input {
-            padding: 10px;
-            width: 250px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            flex: 1;
+            min-width: 0;
+            padding: 14px 16px;
+            border: 1px solid #d5deea;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
         }
 
         .search-box button {
-            padding: 10px 16px;
-            background-color: #007bff;
+            padding: 13px 24px;
+            background: #2563eb;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
         }
 
+        .search-box button:hover {
+            background: #1d4ed8;
+        }
+
+        /* Seat legend */
+        .seat-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+
+        .legend-available {
+            background: #16a34a;
+        }
+
+        .legend-booked {
+            background: #dc2626;
+        }
+
+        .legend-selected {
+            background: #2563eb;
+        }
+
+        /* Workspace grid */
         .workspace-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 24px;
         }
 
+        /* Workspace card */
         .workspace-card {
-            background-color: white;
+            background: white;
+            border: 1px solid #e5eaf2;
+            border-radius: 13px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+            transition: transform 0.25s, box-shadow 0.25s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .workspace-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(15, 23, 42, 0.10);
+        }
+
+        /* Card header */
+        .card-visual {
+            height: 110px;
+            background: linear-gradient(120deg, #dbeafe, #eff6ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-visual::before,
+        .card-visual::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        .card-visual::before {
+            width: 130px;
+            height: 130px;
+            right: -20px;
+            top: -55px;
+        }
+
+        .card-visual::after {
+            width: 95px;
+            height: 95px;
+            left: -25px;
+            bottom: -55px;
+        }
+
+        .visual-symbol {
+            width: 58px;
+            height: 58px;
+            border-radius: 15px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 31px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.10);
+            z-index: 1;
+        }
+
+        .card-content {
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
-        .workspace-card h2 {
-            color: #333;
-            margin-top: 0;
+        .card-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 11px;
         }
 
+        .workspace-card h3 {
+            color: #17365d;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+
+        .status {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 6px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .status-available {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-full {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .location {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        /* Seat information */
         .seat-info {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 15px 0;
+            background: #f8fafc;
+            border: 1px solid #edf1f7;
+            border-radius: 9px;
+            padding: 15px 8px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
-        .seat-info p {
-            margin: 8px 0;
+        .seat-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        .available {
-            color: green;
-            font-weight: bold;
+        .seat-stat span {
+            color: #64748b;
+            font-size: 11px;
         }
 
-        .booked {
-            color: red;
-            font-weight: bold;
+        .seat-stat strong {
+            font-size: 20px;
         }
 
+        .total strong {
+            color: #334155;
+        }
+
+        .available strong {
+            color: #15803d;
+        }
+
+        .booked strong {
+            color: #dc2626;
+        }
+
+        /* Button */
         .details-button {
-            display: inline-block;
-            background-color: #007bff;
+            display: block;
+            text-align: center;
+            background: #2563eb;
             color: white;
-            padding: 10px 14px;
+            padding: 13px;
             text-decoration: none;
-            border-radius: 5px;
-            margin-top: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: auto;
+            transition: background 0.2s;
         }
 
-        .bookings-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #007bff;
-            text-decoration: none;
+        .details-button:hover {
+            background: #1d4ed8;
         }
 
+        /* No results */
         .no-results {
-            color: #666;
+            background: white;
+            padding: 45px 25px;
+            text-align: center;
+            border-radius: 12px;
+            color: #64748b;
+            grid-column: 1 / -1;
+            border: 1px solid #e5eaf2;
+        }
+
+        .no-results h3 {
+            color: #17365d;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 40px;
+            border-top: 1px solid #e5eaf2;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 16px 5%;
+            }
+
+            .nav-actions {
+                flex-wrap: wrap;
+            }
+
+            .main-container {
+                padding: 0 16px;
+                margin-top: 22px;
+            }
+
+            .welcome-section {
+                padding: 25px;
+            }
+
+            .welcome-section::after {
+                right: 15px;
+                top: 15px;
+                font-size: 48px;
+            }
+
+            .welcome-section h1 {
+                font-size: 24px;
+            }
+
+            .section-header h2 {
+                font-size: 21px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box button {
+                width: 100%;
+            }
+
+            .workspace-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="header">
-        <h1>Welcome, {{ session.get('user_name') }}!</h1>
+    <!-- Navigation -->
+    <nav class="navbar">
 
-        <form action="{{ url_for('logout') }}" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="logout">Logout</button>
-</form>
-    </div>
+        <div class="brand">
+            🪑 Book <span>My</span> Seat
+        </div>
 
-    <h2>Available Workspaces</h2>
+        <div class="nav-actions">
 
-    <form method="GET"
-          action="{{ url_for('workspaces') }}"
-          class="search-box">
-
-        <input
-            type="text"
-            name="search"
-            placeholder="Search workspace or location"
-            value="{{ search }}"
-        >
-
-        <button type="submit">Search</button>
-    </form>
-
-    <div class="workspace-container">
-
-        {% for workspace in workspaces %}
-
-        <div class="workspace-card">
-
-            <h2>{{ workspace['workspace_name'] }}</h2>
-
-            <p>
-                <strong>Location:</strong>
-                {{ workspace['location'] }}
-            </p>
-
-            <p>
-                <strong>Workspace ID:</strong>
-                {{ workspace['id'] }}
-            </p>
-
-            <div class="seat-info">
-
-                <p>
-                    Total Seats:
-                    {{ workspace['total_seats'] }}
-                </p>
-
-                <p class="available">
-                    Available Seats:
-                    {{ workspace['available_seats'] }}
-                </p>
-
-                <p class="booked">
-                    Booked Seats:
-                    {{ workspace['booked_seats'] }}
-                </p>
-
-            </div>
-
-            <a
-                href="{{ url_for('workspace_details', workspace_id=workspace['id']) }}"
-                class="details-button"
-            >
-                View Details
+            <a href="{{ url_for('my_bookings') }}">
+                My Bookings
             </a>
+
+            <form action="{{ url_for('logout') }}" method="POST">
+                <input type="hidden" name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <button type="submit" class="logout">
+                    Logout
+                </button>
+            </form>
 
         </div>
 
-        {% else %}
+    </nav>
 
-        <p class="no-results">
-            No workspaces found.
-        </p>
+    <!-- Main content -->
+    <main class="main-container">
 
-        {% endfor %}
+        <!-- Welcome banner -->
+        <section class="welcome-section">
 
-    </div>
+            <div class="welcome-label">
+                WORKSPACE BOOKING PLATFORM
+            </div>
 
-    <a href="{{ url_for('my_bookings') }}" class="bookings-link">
-        View My Bookings
-    </a>
+            <h1>Welcome to Book My Seat! 🪑</h1>
+
+            <p>
+                Find your perfect workspace, check seat availability
+                and reserve your preferred seat easily.
+            </p>
+
+        </section>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(category_filter=["booking_error"]) %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Workspace heading -->
+        <div class="section-header">
+
+            <h2>Explore Workspaces</h2>
+
+            <p>
+                Find a workspace that suits your needs.
+            </p>
+
+        </div>
+
+        <!-- Search -->
+        <form method="GET"
+              action="{{ url_for('workspaces') }}"
+              class="search-box">
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Search by workspace name or location..."
+                value="{{ search }}"
+            >
+
+            <button type="submit">
+                Search
+            </button>
+
+        </form>
+
+        <!-- Seat status legend -->
+        <div class="seat-legend">
+
+            <div class="legend-item">
+                <span class="legend-dot legend-available"></span>
+                Available
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-dot legend-booked"></span>
+                Booked
+            </div>
+
+            <div class="legend-item">
+                <span class="legend-dot legend-selected"></span>
+                Selected
+            </div>
+
+        </div>
+
+        <!-- Workspace cards -->
+        <div class="workspace-container">
+
+            {% for workspace in workspaces %}
+
+            <div class="workspace-card">
+
+                <div class="card-visual">
+                    <div class="visual-symbol">🪑</div>
+                </div>
+
+                <div class="card-content">
+
+                    <div class="card-heading">
+
+                        <h3>
+                            {{ workspace['workspace_name'] }}
+                        </h3>
+
+                        {% if workspace['available_seats']|int > 0 %}
+                            <span class="status status-available">
+                                Available
+                            </span>
+                        {% else %}
+                            <span class="status status-full">
+                                Fully Booked
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                    <p class="location">
+                        📍 Location: {{ workspace['location'] }}
+                    </p>
+
+                    <div class="seat-info">
+
+                        <div class="seat-stat total">
+                            <span>Total Seats</span>
+                            <strong>{{ workspace['total_seats'] }}</strong>
+                        </div>
+
+                        <div class="seat-stat available">
+                            <span>Available</span>
+                            <strong>{{ workspace['available_seats'] }}</strong>
+                        </div>
+
+                        <div class="seat-stat booked">
+                            <span>Booked</span>
+                            <strong>{{ workspace['booked_seats'] }}</strong>
+                        </div>
+
+                    </div>
+
+                    <a
+                        href="{{ url_for('workspace_details', workspace_id=workspace['id']) }}"
+                        class="details-button"
+                    >
+                        View Workspace →
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="no-results">
+                <h3>No Workspaces Found</h3>
+                <p>
+                    Try searching with another workspace name or location.
+                </p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        © 2026 Book My Seat. All rights reserved.
+    </footer>
+
 </body>
 </html>

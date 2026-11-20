@@ -1,86 +1,556 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Manage Workspaces</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Manage Workspaces | Book My Seat</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #142d4e;
+            color: white;
+            padding: 17px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #60a5fa;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            background: #2563eb;
+            padding: 10px 15px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .navbar a:hover {
+            background: #1d4ed8;
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h1 {
+            color: #17365d;
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .page-heading p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Add workspace section */
+        .add-section {
+            background: white;
+            padding: 27px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+            margin-bottom: 30px;
+        }
+
+        .section-heading {
+            color: #17365d;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .add-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 13px 22px;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .add-button:hover {
+            background: #1d4ed8;
+        }
+
+        /* Workspace list */
+        .workspace-section {
+            background: white;
+            padding: 27px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .workspace-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .workspace-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 11px;
+            overflow: hidden;
+            background: #fff;
+            transition: 0.2s;
+        }
+
+        .workspace-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+            transform: translateY(-3px);
+        }
+
+        .workspace-card-header {
+            background: #eff6ff;
+            padding: 18px;
+            border-bottom: 1px solid #dbeafe;
+        }
+
+        .workspace-card-header h3 {
+            color: #17365d;
+            font-size: 18px;
+            margin-bottom: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .workspace-card-header p {
+            color: #64748b;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .workspace-content {
+            padding: 20px;
+        }
+
+        .workspace-content label {
+            display: block;
+            color: #475569;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .workspace-content input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            font-size: 14px;
+        }
+
+        .workspace-content input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .action-button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .update-button {
+            background: #2563eb;
+            color: white;
+        }
+
+        .update-button:hover {
+            background: #1d4ed8;
+        }
+
+        .seats-button {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .seats-button:hover {
+            background: #bbf7d0;
+        }
+
+        .deactivate-button {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .deactivate-button:hover {
+            background: #fecaca;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 35px 15px;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 9px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .empty-state h3 {
+            color: #17365d;
+            margin-bottom: 9px;
+        }
+
+        /* Logout */
+        .logout-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .logout-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background: #b91c1c;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 35px;
+            border-top: 1px solid #e5eaf2;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .workspace-list {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .navbar {
+                flex-wrap: wrap;
+                padding: 16px 5%;
+            }
+
+            .main-container {
+                margin-top: 23px;
+            }
+
+            .add-section,
+            .workspace-section {
+                padding: 18px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+
+            .action-button {
+                width: 100%;
+            }
+
+            .logout-section {
+                justify-content: flex-start;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <h1>Manage Workspaces</h1>
+    <!-- Navigation -->
+    <nav class="navbar">
 
-    <p>
-        <a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
-    </p>
+        <div class="brand">
+            🪑 Book <span>My</span> Seat
+        </div>
 
-    <hr>
+        <a href="{{ url_for('admin_dashboard') }}">
+            ← Admin Dashboard
+        </a>
 
-    <h2>Add New Workspace</h2>
+    </nav>
 
-    <form action="{{ url_for('admin_workspaces') }}" method="POST">
+    <main class="main-container">
 
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- Page Heading -->
+        <div class="page-heading">
 
-    <label>Workspace Name:</label>
-    <input type="text" name="workspace_name" required>
+            <h1>Manage Workspaces</h1>
 
-    <br><br>
+            <p>Add new workspaces, update details and manage workspace seats.</p>
 
-    <label>Location:</label>
-    <input type="text" name="location" required>
+        </div>
 
-    <br><br>
+        <!-- Add New Workspace -->
+        <section class="add-section">
 
-    <button type="submit">Add Workspace</button>
+            <h2 class="section-heading">＋ Add New Workspace</h2>
 
-</form>
+            <form action="{{ url_for('admin_workspaces') }}" method="POST">
 
-    <hr>
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
 
-    <h2>Existing Workspaces</h2>
+                <div class="form-grid">
 
-    {% for workspace in workspaces %}
+                    <div class="form-group">
 
-        <h3>{{ workspace.workspace_name }}</h3>
+                        <label for="workspace_name">Workspace Name</label>
 
-        <p>Location: {{ workspace.location }}</p>
+                        <input type="text"
+                               id="workspace_name"
+                               name="workspace_name"
+                               placeholder="Enter workspace name"
+                               maxlength="100"
+                               required>
 
-        <form action="{{ url_for('admin_update_workspace', workspace_id=workspace.id) }}"
-      method="POST">
+                    </div>
 
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
 
-    <input type="text" name="workspace_name"
-           value="{{ workspace.workspace_name }}" required>
+                        <label for="location">Location</label>
 
-    <input type="text" name="location"
-           value="{{ workspace.location }}" required>
+                        <input type="text"
+                               id="location"
+                               name="location"
+                               placeholder="Enter workspace location"
+                               maxlength="200"
+                               required>
 
-    <button type="submit">Update</button>
+                    </div>
 
-</form>
-        <p>
-            <a href="{{ url_for('admin_seats', workspace_id=workspace.id) }}">
-    Manage Seats
-</a>
-        </p>
+                </div>
 
-        <form action="{{ url_for('admin_deactivate_workspace', workspace_id=workspace.id) }}"
-      method="POST">
+                <button type="submit" class="add-button">
+                    + Add Workspace
+                </button>
 
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            </form>
 
-    <button type="submit">Deactivate Workspace</button>
+        </section>
 
-</form>
+        <!-- Existing Workspaces -->
+        <section class="workspace-section">
 
-        <hr>
+            <h2 class="section-heading">Existing Workspaces</h2>
 
-    {% endfor %}
+            {% if workspaces %}
 
-    <form action="{{ url_for('logout') }}" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">Logout</button>
-</form>
+                <div class="workspace-list">
+
+                    {% for workspace in workspaces %}
+
+                        <div class="workspace-card">
+
+                            <div class="workspace-card-header">
+
+                                <h3>🏢 {{ workspace.workspace_name }}</h3>
+
+                                <p>📍 {{ workspace.location }}</p>
+
+                            </div>
+
+                            <div class="workspace-content">
+
+                                <!-- Update Workspace Form -->
+                                <form action="{{ url_for('admin_update_workspace', workspace_id=workspace.id) }}"
+                                      method="POST">
+
+                                    <input type="hidden"
+                                           name="csrf_token"
+                                           value="{{ csrf_token() }}">
+
+                                    <label>Workspace Name</label>
+
+                                    <input type="text"
+                                           name="workspace_name"
+                                           value="{{ workspace.workspace_name }}"
+                                           maxlength="100"
+                                           required>
+
+                                    <label>Location</label>
+
+                                    <input type="text"
+                                           name="location"
+                                           value="{{ workspace.location }}"
+                                           maxlength="200"
+                                           required>
+
+                                    <div class="card-actions">
+
+                                        <button type="submit"
+                                                class="action-button update-button">
+                                            Update Details
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                                <!-- Manage Seats -->
+                                <div class="card-actions">
+
+                                    <a class="action-button seats-button"
+                                       href="{{ url_for('admin_seats', workspace_id=workspace.id) }}">
+                                        🪑 Manage Seats
+                                    </a>
+
+                                </div>
+
+                                <!-- Deactivate Workspace -->
+                                <form action="{{ url_for('admin_deactivate_workspace', workspace_id=workspace.id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Are you sure you want to deactivate this workspace?');">
+
+                                    <input type="hidden"
+                                           name="csrf_token"
+                                           value="{{ csrf_token() }}">
+
+                                    <div class="card-actions">
+
+                                        <button type="submit"
+                                                class="action-button deactivate-button">
+                                            Deactivate Workspace
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>No Workspaces Found</h3>
+
+                    <p>Add a new workspace using the form above.</p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <!-- Logout -->
+        <div class="logout-section">
+
+            <form action="{{ url_for('logout') }}" method="POST">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <button type="submit" class="logout-button">
+                    Logout
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        © 2026 Book My Seat. All rights reserved.
+    </footer>
+
 </body>
 </html>

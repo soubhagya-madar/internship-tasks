@@ -1,212 +1,1030 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Workspace Seats</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Seats | Book My Seat</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 30px;
-            background-color: #f5f6fa;
+            background: #f1f5f9;
+            color: #1e293b;
         }
 
-        h1, h2 {
-            color: #333;
+        /* Navigation */
+        .navbar {
+            background: #142d4e;
+            color: white;
+            padding: 17px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
         }
 
-        .seat-summary {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .brand {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #60a5fa;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            background: #2563eb;
+            padding: 10px 15px;
+            border-radius: 7px;
+        }
+
+        .navbar a:hover {
+            background: #1d4ed8;
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        /* Workspace banner */
+        .workspace-header {
+            background: linear-gradient(120deg, #17365d, #2563a6);
+            color: white;
+            padding: 30px;
+            border-radius: 14px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workspace-header::after {
+            content: "🪑";
+            position: absolute;
+            right: 40px;
+            top: 15px;
+            font-size: 75px;
+            opacity: 0.2;
+        }
+
+        .workspace-header h1 {
+            font-size: 27px;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .workspace-header p {
+            color: #dbeafe;
+            font-size: 14px;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Summary */
+        .summary {
+            background: white;
+            padding: 23px;
+            border-radius: 13px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+            margin-bottom: 28px;
+        }
+
+        .summary h2,
+        .seat-section h2 {
+            color: #17365d;
+            margin-bottom: 20px;
+            font-size: 21px;
         }
 
         .summary-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .summary-card {
+            padding: 22px 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-card h3 {
+            font-size: 29px;
+            margin-bottom: 8px;
+        }
+
+        .summary-card p {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .total {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .available {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .booked {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Seat section */
+        .seat-section {
+            background: white;
+            padding: 26px;
+            border-radius: 13px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .instruction {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .selection-count {
+            color: #2563eb;
+            background: #eff6ff;
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 7px;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            margin-bottom: 25px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .legend-box {
+            width: 17px;
+            height: 17px;
+            border-radius: 4px;
+        }
+
+        .green {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+        }
+
+        .red {
+            background: #fee2e2;
+            border: 1px solid #dc2626;
+        }
+
+        .blue {
+            background: #dbeafe;
+            border: 2px solid #2563eb;
+        }
+
+        /* Seat grid */
+        .seat-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+            gap: 17px;
+        }
+
+        .seat-card {
+            min-height: 130px;
+            border-radius: 11px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 13px;
+            transition: 0.2s;
+        }
+
+        .available-seat {
+            background: #f0fdf4;
+            border: 2px solid #16a34a;
+        }
+
+        .available-seat:hover {
+            background: #dcfce7;
+            transform: translateY(-3px);
+        }
+
+        .booked-seat {
+            background: #fef2f2;
+            border: 2px solid #dc2626;
+            opacity: 0.8;
+        }
+
+        .selected-seat {
+            background: #dbeafe;
+            border: 2px solid #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            transform: translateY(-3px);
+        }
+
+        .seat-icon {
+            font-size: 27px;
+        }
+
+        .seat-number {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .seat-status {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .available-seat .seat-status {
+            color: #15803d;
+        }
+
+        .booked-seat .seat-status {
+            color: #b91c1c;
+        }
+
+        .selected-seat .seat-status {
+            color: #1d4ed8;
+        }
+
+        .select-button {
+            padding: 8px 13px;
+            border: none;
+            border-radius: 5px;
+            background: #16a34a;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .selected-seat .select-button {
+            background: #2563eb;
+        }
+
+        .disabled-button {
+            padding: 8px 13px;
+            border: none;
+            border-radius: 5px;
+            background: #cbd5e1;
+            color: #64748b;
+            cursor: not-allowed;
+            font-size: 12px;
+        }
+
+        /* Booking button */
+        .book-button {
+            margin-top: 28px;
+            padding: 14px 25px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        .book-button:hover {
+            background: #1d4ed8;
+        }
+
+        .book-button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Links */
+        .links {
+            margin-top: 25px;
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
         }
 
-        .summary-card {
-            padding: 15px 25px;
-            border-radius: 8px;
-            min-width: 110px;
-            text-align: center;
+        .links a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
         }
 
-        .total {
-            background-color: #e3e8ff;
-            color: #263b91;
+        .links a:hover {
+            text-decoration: underline;
         }
 
-        .available {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .booked {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .seat-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .seat-card {
-            width: 130px;
+        /* Booking popup */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.68);
+            justify-content: center;
+            align-items: center;
             padding: 20px;
-            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 430px;
+            padding: 30px;
+            border-radius: 14px;
             text-align: center;
-            background-color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .available-seat {
-            border: 2px solid #28a745;
+        .modal-icon {
+            font-size: 38px;
+            margin-bottom: 12px;
         }
 
-        .booked-seat {
-            border: 2px solid #dc3545;
+        .modal-content h2 {
+            color: #17365d;
+            margin-bottom: 12px;
         }
 
-        button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #28a745;
+        .modal-content > p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .booking-details {
+            background: #f1f5f9;
+            padding: 17px;
+            border-radius: 9px;
+            margin: 20px 0;
+            line-height: 2;
+            text-align: left;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334155;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .confirm-button {
+            background: #2563eb;
             color: white;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 8px;
         }
 
-        button:disabled {
-            background-color: #999;
+        .confirm-button:hover {
+            background: #1d4ed8;
+        }
+
+        .confirm-button:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
         }
 
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            color: #007bff;
-            text-decoration: none;
+        .cancel-button {
+            background: #e2e8f0;
+            color: #334155;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 7px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .cancel-button:hover {
+            background: #cbd5e1;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 35px;
+            border-top: 1px solid #e5eaf2;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .navbar {
+                flex-wrap: wrap;
+                gap: 12px;
+                padding: 16px 5%;
+            }
+
+            .main-container {
+                margin-top: 22px;
+            }
+
+            .workspace-header {
+                padding: 24px;
+            }
+
+            .workspace-header h1 {
+                font-size: 23px;
+            }
+
+            .workspace-header::after {
+                right: 10px;
+                font-size: 45px;
+            }
+
+            .summary-container {
+                grid-template-columns: 1fr;
+            }
+
+            .seat-section {
+                padding: 17px;
+            }
+
+            .seat-container {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .modal-content {
+                padding: 22px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <h1>{{ workspace['workspace_name'] }}</h1>
+    <!-- Navigation -->
+    <nav class="navbar">
 
-    <p>Location: {{ workspace['location'] }}</p>
+        <div class="brand">
+            🪑 Book <span>My</span> Seat
+        </div>
 
-    <p>Workspace ID: {{ workspace['id'] }}</p>
+        <a href="{{ url_for('workspaces') }}">
+            ← Back to Workspaces
+        </a>
 
-    <hr>
+    </nav>
 
-    <!-- Seat Summary -->
-    <div class="seat-summary">
+    <main class="main-container">
 
-        <h2>Seat Summary</h2>
+        <!-- Workspace information -->
+        <div class="workspace-header">
 
-        <div class="summary-container">
+            <h1>{{ workspace['workspace_name'] }}</h1>
 
-            <div class="summary-card total">
-                <h2>{{ total_seats }}</h2>
-                <p>Total Seats</p>
+            <p>📍 {{ workspace['location'] }}</p>
+
+            <p>Select your preferred seats and reserve your workspace.</p>
+
+        </div>
+
+        <!-- Seat Summary -->
+        <section class="summary">
+
+            <h2>Seat Summary</h2>
+
+            <div class="summary-container">
+
+                <div class="summary-card total">
+                    <h3>{{ total_seats }}</h3>
+                    <p>Total Seats</p>
+                </div>
+
+                <div class="summary-card available">
+                    <h3>{{ available_seats }}</h3>
+                    <p>Available Seats</p>
+                </div>
+
+                <div class="summary-card booked">
+                    <h3>{{ booked_seats }}</h3>
+                    <p>Booked Seats</p>
+                </div>
+
             </div>
 
-            <div class="summary-card available">
-                <h2>{{ available_seats }}</h2>
-                <p>Available Seats</p>
+        </section>
+
+        <!-- Seat Selection -->
+        <section class="seat-section">
+
+            <h2>🪑 Select Your Seats</h2>
+
+            <p class="instruction">
+                Choose your preferred seats below.
+                You can select a maximum of 5 seats from this workspace.
+            </p>
+
+            <p class="selection-count" id="selectionCount">
+                Selected Seats: 0 / 5
+            </p>
+
+            <!-- Seat legend -->
+            <div class="legend">
+
+                <div class="legend-item">
+                    <span class="legend-box green"></span>
+                    Available
+                </div>
+
+                <div class="legend-item">
+                    <span class="legend-box blue"></span>
+                    Selected
+                </div>
+
+                <div class="legend-item">
+                    <span class="legend-box red"></span>
+                    Booked
+                </div>
+
             </div>
 
-            <div class="summary-card booked">
-                <h2>{{ booked_seats }}</h2>
-                <p>Booked Seats</p>
+            <!-- Booking Form -->
+            <form id="bookingForm"
+                  action="{{ url_for('book_seats') }}"
+                  method="POST">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <div class="seat-container">
+
+                    {% for seat in seats %}
+
+                        {% if seat['status'] == 'Available' %}
+
+                            <div class="seat-card available-seat"
+                                 id="card-{{ seat['id'] }}">
+
+                                <div class="seat-icon">🪑</div>
+
+                                <div class="seat-number">
+                                    {{ seat['seat_number'] }}
+                                </div>
+
+                                <p class="seat-status">Available</p>
+
+                                {% if session.get('user_id') and session.get('role') == 'user' %}
+
+                                    <button type="button"
+                                            class="select-button"
+                                            data-seat-id="{{ seat['id'] }}"
+                                            data-seat-number="{{ seat['seat_number'] }}">
+                                        Select Seat
+                                    </button>
+
+                                {% else %}
+
+                                    <p>Please login to book.</p>
+                                    <a href="{{ url_for('login') }}">Login</a>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="seat-card booked-seat">
+
+                                <div class="seat-icon">🪑</div>
+
+                                <div class="seat-number">
+                                    {{ seat['seat_number'] }}
+                                </div>
+
+                                <p class="seat-status">Booked</p>
+
+                                <button type="button"
+                                        class="disabled-button"
+                                        disabled>
+                                    Not Available
+                                </button>
+
+                            </div>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+
+                {% if session.get('user_id') and session.get('role') == 'user' %}
+
+                    <button type="button"
+                            class="book-button"
+                            id="bookButton"
+                            disabled>
+                        Continue to Booking →
+                    </button>
+
+                {% endif %}
+
+            </form>
+
+        </section>
+
+        <!-- Navigation links -->
+        <div class="links">
+
+            <a href="{{ url_for('workspaces') }}">
+                ← Back to Workspaces
+            </a>
+
+            <a href="{{ url_for('my_bookings') }}">
+                My Bookings
+            </a>
+
+        </div>
+
+    </main>
+
+    <!-- Booking Details Modal -->
+    <div class="modal" id="bookingModal">
+
+        <div class="modal-content">
+
+            <div class="modal-icon">📝</div>
+
+            <h2>Complete Your Booking</h2>
+
+            <p>Please enter your contact details to confirm your seats.</p>
+
+            <div class="booking-details">
+
+                <p>
+                    <strong>Workspace:</strong>
+                    {{ workspace['workspace_name'] }}
+                </p>
+
+                <p>
+                    <strong>Location:</strong>
+                    {{ workspace['location'] }}
+                </p>
+
+                <p>
+                    <strong>Selected Seats:</strong>
+                    <span id="selectedSeatNumbers"></span>
+                </p>
+
+                <p>
+                    <strong>Total Seats:</strong>
+                    <span id="totalSelected"></span>
+                </p>
+
             </div>
+
+            <div class="form-group">
+
+                <label for="fullName">Full Name</label>
+
+                <input type="text"
+                       id="fullName"
+                       placeholder="Enter your full name"
+                       maxlength="100"
+                       autocomplete="name"
+                       required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="phone">Phone Number</label>
+
+                <input type="tel"
+                       id="phone"
+                       placeholder="Enter your 10-digit phone number"
+                       maxlength="15"
+                       autocomplete="tel"
+                       required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="email">Email Address</label>
+
+                <input type="email"
+                       id="email"
+                       placeholder="Enter your email address"
+                       maxlength="254"
+                       autocomplete="email"
+                       required>
+
+            </div>
+
+            <button type="button"
+                    class="confirm-button"
+                    id="confirmButton">
+                Confirm Booking
+            </button>
+
+            <button type="button"
+                    class="cancel-button"
+                    id="cancelButton">
+                Cancel
+            </button>
 
         </div>
 
     </div>
 
-    <hr>
+    <!-- JavaScript -->
+    <script>
 
-    <h2>Available Seats</h2>
+        // Store selected seats.
+        let selectedSeats = [];
 
+        // Select or deselect a seat.
+        function selectSeat(seatId, seatNumber) {
 
-    <!-- Display Seats -->
-    <div class="seat-container">
+            const existingIndex = selectedSeats.findIndex(
+                seat => seat.id === seatId
+            );
 
-        {% for seat in seats %}
+            const card = document.getElementById("card-" + seatId);
 
-            {% if seat['status'] == 'Available' %}
+            if (existingIndex !== -1) {
 
-                <div class="seat-card available-seat">
+                // Remove selected seat.
+                selectedSeats.splice(existingIndex, 1);
 
-                    <h3>{{ seat['seat_number'] }}</h3>
+                card.classList.remove("selected-seat");
+                card.classList.add("available-seat");
 
-                    <p>Available</p>
+                card.querySelector(".seat-status").textContent = "Available";
 
-                    {% if session.get('user_id') and session.get('role') == 'user' %}
+                card.querySelector(".select-button").textContent = "Select Seat";
 
-                        <form action="{{ url_for('book_seat', seat_id=seat['id']) }}"
-      method="POST">
+            } else {
 
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                // Maximum 5 seats.
+                if (selectedSeats.length >= 5) {
+                    alert("You can select a maximum of 5 seats.");
+                    return;
+                }
 
-    <button type="submit">
-        Book Seat
-    </button>
+                // Add selected seat.
+                selectedSeats.push({
+                    id: seatId,
+                    number: seatNumber
+                });
 
-</form>
+                card.classList.remove("available-seat");
+                card.classList.add("selected-seat");
 
-                    {% else %}
+                card.querySelector(".seat-status").textContent = "Selected";
 
-                        <p>Please login to book.</p>
+                card.querySelector(".select-button").textContent = "Selected";
+            }
 
-                        <a href="{{ url_for('login') }}">
-                            Login
-                        </a>
+            updateSelection();
+        }
 
-                    {% endif %}
+        // Update selected seat count.
+        function updateSelection() {
 
-                </div>
+            document.getElementById("selectionCount").textContent =
+                "Selected Seats: " + selectedSeats.length + " / 5";
 
-            {% else %}
+            document.getElementById("bookButton").disabled =
+                selectedSeats.length === 0;
+        }
 
-                <div class="seat-card booked-seat">
+        // Open booking popup.
+        function openModal() {
 
-                    <h3>{{ seat['seat_number'] }}</h3>
+            if (selectedSeats.length === 0) {
+                alert("Please select at least one seat.");
+                return;
+            }
 
-                    <p>Booked</p>
+            const seatNumbers = selectedSeats
+                .map(seat => seat.number)
+                .join(", ");
 
-                    <button type="button" disabled>
-                        Not Available
-                    </button>
+            document.getElementById("selectedSeatNumbers").textContent =
+                seatNumbers;
 
-                </div>
+            document.getElementById("totalSelected").textContent =
+                selectedSeats.length;
 
-            {% endif %}
+            document.getElementById("bookingModal").style.display = "flex";
+        }
 
-        {% endfor %}
+        // Close popup.
+        function closeModal() {
+            document.getElementById("bookingModal").style.display = "none";
+        }
 
-    </div>
+        // Confirm booking.
+        function confirmBooking() {
 
-    <br>
+            const fullName = document.getElementById("fullName").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const email = document.getElementById("email").value.trim();
 
-    <a href="{{ url_for('workspaces') }}">
-        Back to Workspaces
-    </a>
+            if (selectedSeats.length === 0) {
+                alert("Please select at least one seat.");
+                return;
+            }
 
-    <br>
+            // Validate name.
+            if (!fullName) {
+                alert("Please enter your full name.");
+                document.getElementById("fullName").focus();
+                return;
+            }
 
-    <a href="{{ url_for('my_bookings') }}">
-        My Bookings
-    </a>
+            if (fullName.length > 100) {
+                alert("Name must be within 100 characters.");
+                return;
+            }
+
+            // Validate phone number.
+            const cleanPhone = phone.replace(/[\s-]/g, "");
+
+            if (!/^(?:\+91)?[6-9]\d{9}$/.test(cleanPhone)) {
+                alert("Please enter a valid 10-digit Indian phone number.");
+                document.getElementById("phone").focus();
+                return;
+            }
+
+            // Validate email.
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+                alert("Please enter a valid email address.");
+                document.getElementById("email").focus();
+                return;
+            }
+
+            if (email.length > 254) {
+                alert("Email address is too long.");
+                return;
+            }
+
+            const form = document.getElementById("bookingForm");
+
+            // Add user details to the form.
+            const details = {
+                full_name: fullName,
+                phone: cleanPhone,
+                email: email
+            };
+
+            Object.entries(details).forEach(([name, value]) => {
+
+                const input = document.createElement("input");
+
+                input.type = "hidden";
+                input.name = name;
+                input.value = value;
+
+                form.appendChild(input);
+            });
+
+            // Add selected seat IDs.
+            selectedSeats.forEach(seat => {
+
+                const input = document.createElement("input");
+
+                input.type = "hidden";
+                input.name = "seat_ids";
+                input.value = seat.id;
+
+                form.appendChild(input);
+            });
+
+            // Prevent multiple submissions.
+            const confirmButton = document.getElementById("confirmButton");
+
+            confirmButton.disabled = true;
+            confirmButton.textContent = "Processing...";
+
+            // Submit form to Flask.
+            form.submit();
+        }
+
+        // Attach click event to each available seat button.
+        document.querySelectorAll(".select-button").forEach(button => {
+
+            button.addEventListener("click", function() {
+
+                const seatId = Number(this.dataset.seatId);
+                const seatNumber = this.dataset.seatNumber;
+
+                selectSeat(seatId, seatNumber);
+
+            });
+
+        });
+
+        // Continue to booking button.
+        document.getElementById("bookButton")?.addEventListener(
+            "click",
+            openModal
+        );
+
+        // Confirm booking button.
+        document.getElementById("confirmButton")?.addEventListener(
+            "click",
+            confirmBooking
+        );
+
+        // Cancel button.
+        document.getElementById("cancelButton")?.addEventListener(
+            "click",
+            closeModal
+        );
+
+        // Close popup when clicking outside.
+        document.getElementById("bookingModal").addEventListener(
+            "click",
+            function(event) {
+
+                if (event.target === this) {
+                    closeModal();
+                }
+
+            }
+        );
+
+    </script>
+
+    <footer class="footer">
+        © 2026 Book My Seat. All rights reserved.
+    </footer>
 
 </body>
 </html>

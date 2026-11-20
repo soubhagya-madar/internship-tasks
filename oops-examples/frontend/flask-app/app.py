@@ -3,6 +3,7 @@ from flask import (
     url_for, session, flash, jsonify
 )
 import sqlite3
+import uuid
 import os
 import re
 import logging
@@ -26,7 +27,10 @@ logging.info("Application logging started")
 # ---------------- FLASK CONFIGURATION ----------------
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY")
+app.secret_key = os.environ.get(
+    "FLASK_SECRET_KEY",
+    "book-my-seat-local-secret-key"
+)
 
 csrf = CSRFProtect(app)
 
@@ -62,6 +66,7 @@ def admin_required(function):
     return wrapper
 
 
+#
 # ---------------- CREATE TABLES ----------------
 
 def create_table():
@@ -122,6 +127,12 @@ def create_table():
         ],
         "seats": [
             ("is_active", "INTEGER NOT NULL DEFAULT 1")
+        ],
+        "bookings": [
+            ("booking_reference", "TEXT"),
+            ("contact_name", "TEXT"),
+            ("contact_phone", "TEXT"),
+            ("contact_email", "TEXT")
         ]
     }
 
@@ -195,8 +206,6 @@ def create_table():
     conn.commit()
     conn.close()
 
-
-# ---------------- HOME PAGE ----------------
 
 @app.route("/")
 def home():
@@ -560,117 +569,199 @@ def display_seats(workspace_id):
     )
 
 
-# ---------------- BOOK SEAT ----------------
 
-@app.route("/book-seat/<int:seat_id>", methods=["POST"])
-def book_seat(seat_id):
+# ----------------
+# ---------------- BOOK MULTIPLE SEATS ----------------
 
-    logging.info("Seat booking request received")
-    logging.info("Booking requested for seat ID: %s", seat_id)
+@app.route("/book-seats", methods=["POST"])
+def book_seats():
 
     if "user_id" not in session:
-        logging.warning("Booking failed: User not logged in")
         return redirect(url_for("login"))
 
     if session.get("role") == "admin":
-        logging.warning("Booking blocked: Admin attempted seat booking")
         return redirect(url_for("admin_dashboard"))
 
-    conn = connect_db()
+    # Get user details
+    full_name = request.form.get("full_name", "").strip()
+    phone = request.form.get("phone", "").strip()
+    email = request.form.get("email", "").strip()
+
+    if not full_name or not phone or not email:
+        flash("Please enter all user details.")
+        return redirect(url_for("workspaces"))
+
+    if len(full_name) > 100:
+        flash("Name must be within 100 characters.")
+        
+        return redirect(url_for("workspaces"))
+
+    phone = re.sub(r"[\s-]", "", phone)
+
+    if not re.fullmatch(r"(?:\+91)?[6-9]\d{9}", phone):
+        flash("Please enter a valid 10-digit phone number.")
+        return redirect(url_for("workspaces"))
+
+    if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
+        flash("Please enter a valid email address.")
+        return redirect(url_for("workspaces"))
+
+    if len(email) > 254:
+        flash("Email address is too long.")
+        return redirect(url_for("workspaces"))
+
+    # Get selected seats
+    selected_seat_ids = request.form.getlist("seat_ids")
+
+    if not selected_seat_ids:
+        flash("Please select at least one seat.")
+        return redirect(url_for("workspaces"))
+
+    if len(selected_seat_ids) > 5:
+        flash("You can book a maximum of 5 seats.")
+        return redirect(url_for("workspaces"))
 
     try:
+        seat_ids = [int(seat_id) for seat_id in selected_seat_ids]
 
-        conn.execute("BEGIN IMMEDIATE")
-
-        seat = conn.execute("""
-            SELECT s.*, w.is_active AS workspace_active
-            FROM seats s
-            JOIN workspaces w ON s.workspace_id = w.id
-            WHERE s.id = ?
-            AND s.is_active = 1
-            AND w.is_active = 1
-        """, (seat_id,)).fetchone()
-
-        if seat is None:
-
-            conn.rollback()
-
-            logging.warning(
-                "Booking failed: Seat ID %s not found or inactive",
-                seat_id
-            )
-
-            flash("Seat or workspace not found or inactive.")
+        if len(set(seat_ids)) != len(seat_ids):
+            flash("Duplicate seats are not allowed.")
             return redirect(url_for("workspaces"))
 
-        if seat["status"] != "Available":
+    except ValueError:
+        flash("Invalid seat selection.")
+        return redirect(url_for("workspaces"))
 
+    conn = connect_db()
+    workspace_id = None
+
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+
+        placeholders = ",".join("?" for _ in seat_ids)
+
+        seats = conn.execute(f"""
+            SELECT
+                s.id,
+                s.workspace_id,
+                s.seat_number,
+                s.status
+            FROM seats s
+            JOIN workspaces w ON s.workspace_id = w.id
+            WHERE s.id IN ({placeholders})
+            AND s.is_active = 1
+            AND w.is_active = 1
+        """, seat_ids).fetchall()
+
+        if len(seats) != len(seat_ids):
             conn.rollback()
+            flash("One or more selected seats are unavailable.")
+            return redirect(url_for("workspaces"))
 
-            logging.warning(
-                "Booking failed: Seat ID %s is already booked",
-                seat_id
+        workspace_ids = {
+            seat["workspace_id"] for seat in seats
+        }
+
+        if len(workspace_ids) != 1:
+            conn.rollback()
+            flash("Please select seats from the same workspace.")
+            return redirect(url_for("workspaces"))
+
+        workspace_id = seats[0]["workspace_id"]
+
+        unavailable_seats = [
+            seat["seat_number"]
+            for seat in seats
+            if seat["status"] != "Available"
+        ]
+
+        if unavailable_seats:
+            conn.rollback()
+            flash(
+                "These seats are no longer available: "
+                + ", ".join(unavailable_seats)
             )
-
-            flash("This seat is already booked.")
-
             return redirect(url_for(
                 "display_seats",
-                workspace_id=seat["workspace_id"]
+                workspace_id=workspace_id
             ))
 
-        conn.execute("""
-            UPDATE seats
-            SET status = 'Booked'
-            WHERE id = ?
-            AND status = 'Available'
-            AND is_active = 1
-        """, (seat_id,))
+        booking_date = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
 
-        conn.execute("""
-            INSERT INTO bookings
-            (user_id, seat_id, booking_date, status)
-            VALUES (?, ?, ?, 'Booked')
-        """, (
-            session["user_id"],
-            seat_id,
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        ))
+        # Generate professional booking reference ID
+        booking_reference = (
+            "WSP-"
+            + datetime.now().strftime("%Y%m%d")
+            + "-"
+            + uuid.uuid4().hex[:6].upper()
+        )
+
+        booking_ids = []
+
+        for seat in seats:
+
+            cursor = conn.execute("""
+                UPDATE seats
+                SET status = 'Booked'
+                WHERE id = ?
+                AND status = 'Available'
+                AND is_active = 1
+            """, (seat["id"],))
+
+            if cursor.rowcount != 1:
+                raise sqlite3.IntegrityError(
+                    "Seat is no longer available."
+                )
+
+            cursor = conn.execute("""
+                INSERT INTO bookings (
+                    user_id,
+                    seat_id,
+                    booking_date,
+                    status,
+                    booking_reference,
+                    contact_name,
+                    contact_phone,
+                    contact_email
+                )
+                VALUES (?, ?, ?, 'Booked', ?, ?, ?, ?)
+            """, (
+                session["user_id"],
+                seat["id"],
+                booking_date,
+                booking_reference,
+                full_name,
+                phone,
+                email
+            ))
+
+            booking_ids.append(cursor.lastrowid)
 
         conn.commit()
 
+        session["last_booking_ids"] = booking_ids
+
         logging.info(
-            "Seat booked successfully: seat ID %s, user ID %s",
-            seat_id, session["user_id"]
+            "Booking %s completed for user %s",
+            booking_reference,
+            session["user_id"]
         )
 
-        flash("Seat booked successfully.")
-
-        return redirect(url_for(
-            "display_seats",
-            workspace_id=seat["workspace_id"]
-        ))
+        return redirect(url_for("booking_success"))
 
     except sqlite3.IntegrityError:
 
         conn.rollback()
+        logging.exception("Seat booking integrity error")
 
-        logging.warning(
-            "Booking failed due to database integrity error for seat ID %s",
-            seat_id
-        )
+        flash("One or more seats are already booked.")
 
-        flash("This seat is already booked.")
-
-        seat = conn.execute("""
-            SELECT workspace_id FROM seats WHERE id = ?
-        """, (seat_id,)).fetchone()
-
-        if seat:
-
+        if workspace_id is not None:
             return redirect(url_for(
                 "display_seats",
-                workspace_id=seat["workspace_id"]
+                workspace_id=workspace_id
             ))
 
         return redirect(url_for("workspaces"))
@@ -678,18 +769,72 @@ def book_seat(seat_id):
     except Exception:
 
         conn.rollback()
+        logging.exception("Unexpected error during booking")
 
-        logging.exception(
-            "Unexpected error while booking seat ID %s",
-            seat_id
-        )
-
-        flash("An error occurred while booking the seat.")
+        flash("An error occurred while booking seats.")
         return redirect(url_for("workspaces"))
 
     finally:
         conn.close()
+#========BOOKING SUCCESS=============
 
+@app.route("/booking-success")
+def booking_success():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("role") == "admin":
+        return redirect(url_for("admin_dashboard"))
+
+    booking_ids = session.get("last_booking_ids", [])
+
+    if not booking_ids:
+        flash("Booking details not found.")
+        return redirect(url_for("workspaces"))
+
+    conn = connect_db()
+
+    try:
+        placeholders = ",".join("?" for _ in booking_ids)
+
+        bookings = conn.execute(f"""
+            SELECT
+                b.id AS booking_id,
+                b.booking_reference,
+                b.contact_name,
+                b.contact_phone,
+                b.contact_email,
+                b.booking_date,
+                b.status AS booking_status,
+                s.seat_number,
+                s.workspace_id,
+                w.workspace_name,
+                w.location
+            FROM bookings b
+            JOIN seats s ON b.seat_id = s.id
+            JOIN workspaces w ON s.workspace_id = w.id
+            WHERE b.user_id = ?
+            AND b.id IN ({placeholders})
+            ORDER BY b.id
+        """, [session["user_id"]] + booking_ids).fetchall()
+
+    finally:
+        conn.close()
+
+    if not bookings:
+        session.pop("last_booking_ids", None)
+        flash("Booking details not found.")
+        return redirect(url_for("workspaces"))
+
+    # Remove saved IDs after displaying the booking
+    session.pop("last_booking_ids", None)
+
+    return render_template(
+        "booking_success.html",
+        bookings=bookings,
+        booking=bookings[0]
+    )
 
 # ---------------- MY BOOKINGS ----------------
 
@@ -824,7 +969,8 @@ def admin_dashboard():
     )
 
 
-# ---------------- ADMIN WORKSPACE LIST / CREATE ----------------
+# ---------------
+# ADMIN WORKSPACE LIST / CREATE
 
 @app.route("/admin/workspaces", methods=["GET", "POST"])
 @admin_required
@@ -846,9 +992,23 @@ def admin_workspaces():
 
             conn.close()
             flash("Please enter workspace name and location.")
-
             return redirect(url_for("admin_workspaces"))
 
+        # Check for duplicate workspace name and location
+        existing_workspace = conn.execute("""
+            SELECT id FROM workspaces
+            WHERE LOWER(TRIM(workspace_name)) = LOWER(?)
+            AND LOWER(TRIM(location)) = LOWER(?)
+            AND is_active = 1
+        """, (workspace_name, location)).fetchone()
+
+        if existing_workspace:
+
+            conn.close()
+            flash("This workspace already exists. Duplicate workspaces are not allowed.")
+            return redirect(url_for("admin_workspaces"))
+
+        # Insert new workspace
         conn.execute("""
             INSERT INTO workspaces (workspace_name, location)
             VALUES (?, ?)
@@ -874,6 +1034,7 @@ def admin_workspaces():
     )
 
 
+#
 # ---------------- ADMIN UPDATE WORKSPACE ----------------
 
 @app.route(
@@ -898,22 +1059,47 @@ def admin_update_workspace(workspace_id):
 
     conn = connect_db()
 
-    cursor = conn.execute("""
+    # Check whether the active workspace exists
+    current_workspace = conn.execute("""
+        SELECT id FROM workspaces
+        WHERE id = ? AND is_active = 1
+    """, (workspace_id,)).fetchone()
+
+    if not current_workspace:
+
+        conn.close()
+        flash("Active workspace not found.")
+        return redirect(url_for("admin_workspaces"))
+
+    # Check for duplicate workspace name and location
+    existing_workspace = conn.execute("""
+        SELECT id FROM workspaces
+        WHERE LOWER(TRIM(workspace_name)) = LOWER(?)
+        AND LOWER(TRIM(location)) = LOWER(?)
+        AND is_active = 1
+        AND id != ?
+    """, (workspace_name, location, workspace_id)).fetchone()
+
+    if existing_workspace:
+
+        conn.close()
+        flash("Another workspace with the same name and location already exists.")
+        return redirect(url_for("admin_workspaces"))
+
+    # Update workspace
+    conn.execute("""
         UPDATE workspaces
         SET workspace_name = ?, location = ?
         WHERE id = ? AND is_active = 1
     """, (workspace_name, location, workspace_id))
 
     conn.commit()
-    updated = cursor.rowcount
     conn.close()
 
-    if updated == 0:
-        flash("Active workspace not found.")
-    else:
-        flash("Workspace updated successfully.")
+    flash("Workspace updated successfully.")
 
     return redirect(url_for("admin_workspaces"))
+
 
 
 # ---------------- ADMIN DEACTIVATE WORKSPACE ----------------

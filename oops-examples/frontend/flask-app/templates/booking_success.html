@@ -1,0 +1,572 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed | Book My Seat</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Navbar */
+
+        .navbar {
+            background: #17365d;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #60a5fa;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .navbar a:hover {
+            color: #93c5fd;
+        }
+
+        /* Main Container */
+
+        .main-container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .confirmation-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        /* Success Header */
+
+        .success-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .success-icon {
+            width: 85px;
+            height: 85px;
+            background: #dcfce7;
+            color: #15803d;
+            border: 5px solid #bbf7d0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 45px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+
+        .success-header h1 {
+            color: #17365d;
+            font-size: 29px;
+            margin-bottom: 12px;
+        }
+
+        .success-header p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .success-label {
+            display: inline-block;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        /* Reference Box */
+
+        .reference-box {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .reference-label {
+            color: #475569;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .reference-value {
+            color: #17365d;
+            font-size: 25px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            overflow-wrap: anywhere;
+        }
+
+        .copy-button {
+            margin-top: 15px;
+            padding: 9px 18px;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            color: #2563eb;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .copy-button:hover {
+            background: #dbeafe;
+        }
+
+        /* Details */
+
+        .details-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading {
+            color: #17365d;
+            font-size: 18px;
+            margin-bottom: 18px;
+            padding-bottom: 13px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 13px 0;
+            border-bottom: 1px solid #e9eef5;
+            font-size: 14px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #64748b;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            color: #1e293b;
+            font-weight: bold;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 6px 13px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Seats */
+
+        .seat-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 15px;
+        }
+
+        .seat-item {
+            background: white;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 15px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .seat-icon {
+            font-size: 25px;
+        }
+
+        .seat-number {
+            font-weight: bold;
+            color: #17365d;
+        }
+
+        .seat-status {
+            color: #15803d;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        /* Buttons */
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 13px 21px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .primary-btn {
+            background: #17365d;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #0f2745;
+        }
+
+        .secondary-btn {
+            background: #e2e8f0;
+            color: #17365d;
+        }
+
+        .secondary-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 28px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px 5%;
+            }
+
+            .brand {
+                font-size: 19px;
+            }
+
+            .confirmation-card {
+                padding: 22px 16px;
+            }
+
+            .success-header h1 {
+                font-size: 24px;
+            }
+
+            .reference-value {
+                font-size: 19px;
+            }
+
+            .details-section {
+                padding: 17px;
+            }
+
+            .detail-row {
+                font-size: 13px;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+
+    <nav class="navbar">
+        <div class="brand">
+            Book <span>My</span> Seat
+        </div>
+
+        <a href="{{ url_for('workspaces') }}">Home</a>
+    </nav>
+
+    <main class="main-container">
+
+        <div class="confirmation-card">
+
+            <!-- Success Message -->
+
+            <div class="success-header">
+
+                <div class="success-icon">✓</div>
+
+                <h1>Booking Confirmed!</h1>
+
+                <p>
+                    Your workspace reservation has been completed successfully.
+                    Thank you for choosing Book My Seat.
+                </p>
+
+                <span class="success-label">
+                    ✓ BOOKING SUCCESSFUL
+                </span>
+
+            </div>
+
+            <!-- Booking Reference -->
+
+            <div class="reference-box">
+
+                <div class="reference-label">
+                    YOUR BOOKING REFERENCE ID
+                </div>
+
+                <div class="reference-value" id="bookingReference">
+                    {{ booking["booking_reference"] }}
+                </div>
+
+                <button type="button"
+                        class="copy-button"
+                        onclick="copyReference()">
+                    Copy Reference ID
+                </button>
+
+            </div>
+
+            <!-- User Details -->
+
+            <section class="details-section">
+
+                <h2 class="section-heading">
+                    👤 User Details
+                </h2>
+
+                <div class="detail-row">
+                    <span class="detail-label">Full Name</span>
+                    <span class="detail-value">
+                        {{ booking["contact_name"] }}
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Phone Number</span>
+                    <span class="detail-value">
+                        {{ booking["contact_phone"] }}
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Email Address</span>
+                    <span class="detail-value">
+                        {{ booking["contact_email"] }}
+                    </span>
+                </div>
+
+            </section>
+
+            <!-- Booking Details -->
+
+            <section class="details-section">
+
+                <h2 class="section-heading">
+                    📋 Booking Details
+                </h2>
+
+                <div class="detail-row">
+                    <span class="detail-label">Workspace Name</span>
+                    <span class="detail-value">
+                        {{ booking["workspace_name"] }}
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value">
+                        {{ booking["location"] }}
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Booking Date & Time</span>
+                    <span class="detail-value">
+                        {{ booking["booking_date"] }}
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Total Seats Booked</span>
+                    <span class="detail-value">
+                        {{ bookings|length }}
+                    </span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Booking Status</span>
+                    <span class="status">
+                        {{ booking["booking_status"] }}
+                    </span>
+                </div>
+
+            </section>
+
+            <!-- Selected Seats -->
+
+            <section class="details-section">
+
+                <h2 class="section-heading">
+                    🪑 Selected Seats
+                </h2>
+
+                <div class="seat-list">
+
+                    {% for item in bookings %}
+
+                        <div class="seat-item">
+
+                            <span class="seat-icon">🪑</span>
+
+                            <div>
+                                <div class="seat-number">
+                                    {{ item["seat_number"] }}
+                                </div>
+
+                                <div class="seat-status">
+                                    {{ item["booking_status"] }}
+                                </div>
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+            <!-- Navigation Buttons -->
+
+            <div class="button-container">
+
+                <a href="{{ url_for('my_bookings') }}"
+                   class="btn primary-btn">
+                    View My Bookings
+                </a>
+
+                <a href="{{ url_for('workspaces') }}"
+                   class="btn secondary-btn">
+                    Back to Workspaces
+                </a>
+
+                <a href="{{ url_for(
+                    'display_seats',
+                    workspace_id=booking['workspace_id']
+                ) }}"
+                   class="btn secondary-btn">
+                    View Seats
+                </a>
+
+            </div>
+
+            <p class="footer-note">
+                Thank you for booking with Book My Seat!
+            </p>
+
+        </div>
+
+    </main>
+
+    <!-- Copy Reference ID -->
+
+    <script>
+
+        function copyReference() {
+
+            const reference = document.getElementById(
+                "bookingReference"
+            ).textContent.trim();
+
+            const button = document.querySelector(".copy-button");
+
+            if (navigator.clipboard && window.isSecureContext) {
+
+                navigator.clipboard.writeText(reference)
+                    .then(() => {
+                        button.textContent = "Copied!";
+                    })
+                    .catch(() => {
+                        button.textContent = "Copy failed";
+                    });
+
+            } else {
+
+                const tempInput = document.createElement("textarea");
+
+                tempInput.value = reference;
+
+                document.body.appendChild(tempInput);
+
+                tempInput.select();
+
+                const copied = document.execCommand("copy");
+
+                document.body.removeChild(tempInput);
+
+                button.textContent = copied ? "Copied!" : "Copy failed";
+            }
+        }
+
+    </script>
+
+</body>
+</html>

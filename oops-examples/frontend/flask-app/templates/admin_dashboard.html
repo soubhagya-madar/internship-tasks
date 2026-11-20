@@ -1,58 +1,416 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard | Book My Seat</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #142d4e;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .brand span {
+            color: #60a5fa;
+        }
+
+        .admin-label {
+            background: #2563eb;
+            padding: 9px 15px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 1150px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        /* Welcome section */
+        .welcome-section {
+            background: linear-gradient(120deg, #17365d, #2563a6);
+            color: white;
+            padding: 30px;
+            border-radius: 13px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::after {
+            content: "📊";
+            position: absolute;
+            right: 40px;
+            top: 15px;
+            font-size: 75px;
+            opacity: 0.2;
+        }
+
+        .welcome-section h1 {
+            font-size: 27px;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-section p {
+            color: #dbeafe;
+            font-size: 14px;
+            margin-top: 7px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Section heading */
+        .section-heading {
+            color: #17365d;
+            font-size: 21px;
+            margin-bottom: 20px;
+        }
+
+        /* Dashboard cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 24px 18px;
+            border-radius: 11px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+            border-bottom: 4px solid #2563eb;
+            transition: 0.2s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card h3 {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card h2 {
+            color: #17365d;
+            font-size: 30px;
+        }
+
+        .workspace-card {
+            border-bottom-color: #2563eb;
+        }
+
+        .seat-card {
+            border-bottom-color: #16a34a;
+        }
+
+        .user-card {
+            border-bottom-color: #9333ea;
+        }
+
+        .booking-card {
+            border-bottom-color: #ea580c;
+        }
+
+        /* Management section */
+        .management-section {
+            background: white;
+            padding: 26px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .management-section p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .management-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .management-card h3 {
+            color: #17365d;
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .management-card p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .manage-button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .manage-button:hover {
+            background: #1d4ed8;
+        }
+
+        /* Logout */
+        .logout-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .logout-button {
+            background: #dc2626;
+            color: white;
+            padding: 11px 20px;
+            border: none;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background: #b91c1c;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px;
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 35px;
+            border-top: 1px solid #e5eaf2;
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .navbar {
+                flex-wrap: wrap;
+            }
+
+            .welcome-section {
+                padding: 24px;
+            }
+
+            .welcome-section h1 {
+                font-size: 22px;
+            }
+
+            .welcome-section::after {
+                right: 10px;
+                font-size: 45px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .management-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .logout-section {
+                justify-content: flex-start;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <h1>Admin Dashboard</h1>
+    <!-- Navigation -->
+    <nav class="navbar">
 
-    <h3>Welcome, {{ session.get('user_name') }}!</h3>
+        <div class="brand">
+            🪑 Book <span>My</span> Seat
+        </div>
 
-    <p>You are logged in as Admin.</p>
+        <div class="admin-label">
+            ADMIN PANEL
+        </div>
 
-    <hr>
+    </nav>
 
-    <h2>Dashboard Overview</h2>
+    <main class="main-container">
 
-    <div>
-        <h3>Total Workspaces</h3>
-        <h2>{{ total_workspaces }}</h2>
-    </div>
+        <!-- Welcome -->
+        <section class="welcome-section">
 
-    <div>
-        <h3>Total Seats</h3>
-        <h2>{{ total_seats }}</h2>
-    </div>
+            <h1>
+                Welcome, {{ session.get('user_name') }}!
+            </h1>
 
-    <div>
-        <h3>Total Users</h3>
-        <h2>{{ total_users }}</h2>
-    </div>
+            <p>Manage your workspace booking system from one place.</p>
 
-    <div>
-        <h3>Active Bookings</h3>
-        <h2>{{ total_bookings }}</h2>
-    </div>
+            <p>Logged in as Administrator</p>
 
-    <hr>
+        </section>
 
-    <h2>Admin Management</h2>
+        <!-- Dashboard Overview -->
+        <h2 class="section-heading">
+            Dashboard Overview
+        </h2>
 
-    <p>
-        <a href="{{ url_for('admin_workspaces') }}">
-            Manage Workspaces and Seats
-        </a>
-    </p>
+        <div class="dashboard-grid">
 
-    <br>
+            <div class="dashboard-card workspace-card">
 
-    <form action="{{ url_for('logout') }}" method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">Logout</button>
-</form>
+                <div class="card-icon">🏢</div>
+
+                <h3>Total Workspaces</h3>
+
+                <h2>{{ total_workspaces }}</h2>
+
+            </div>
+
+            <div class="dashboard-card seat-card">
+
+                <div class="card-icon">🪑</div>
+
+                <h3>Total Seats</h3>
+
+                <h2>{{ total_seats }}</h2>
+
+            </div>
+
+            <div class="dashboard-card user-card">
+
+                <div class="card-icon">👥</div>
+
+                <h3>Total Users</h3>
+
+                <h2>{{ total_users }}</h2>
+
+            </div>
+
+            <div class="dashboard-card booking-card">
+
+                <div class="card-icon">📅</div>
+
+                <h3>Active Bookings</h3>
+
+                <h2>{{ total_bookings }}</h2>
+
+            </div>
+
+        </div>
+
+        <!-- Admin Management -->
+        <section class="management-section">
+
+            <h2 class="section-heading">
+                Admin Management
+            </h2>
+
+            <p>
+                Manage workspace information and control the seats
+                available for users.
+            </p>
+
+            <div class="management-card">
+
+                <div>
+                    <h3>🏢 Manage Workspaces and Seats</h3>
+
+                    <p>
+                        Add, view, update and manage workspaces
+                        and their seats.
+                    </p>
+                </div>
+
+                <a class="manage-button"
+   href="{{ url_for('admin_workspaces') }}">
+    Manage Workspaces & Seats →
+</a>
+
+            </div>
+
+        </section>
+
+        <!-- Logout -->
+        <div class="logout-section">
+
+            <form action="{{ url_for('logout') }}" method="POST">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <button type="submit" class="logout-button">
+                    Logout
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        © 2026 Book My Seat. All rights reserved.
+    </footer>
 
 </body>
 </html>
